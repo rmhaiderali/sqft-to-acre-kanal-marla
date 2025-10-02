@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      :root {
+        color-scheme: dark light
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td><label for="totalsqft">Square Feet:</label></td>
+        <td><input type="text" id="totalsqft" value="0" /></td>
+      </tr>
+      <tr>
+        <td>↕️</td>
+      </tr>
+      <tr>
+        <td><label for="acres">Acres:</label></td>
+        <td><input type="text" id="acres" value="0" /></td>
+      </tr>
+      <tr>
+        <td><label for="kanal">Kanal:</label></td>
+        <td><input type="text" id="kanal" value="0" /></td>
+      </tr>
+      <tr>
+        <td><label for="marla">Marla:</label></td>
+        <td><input type="text" id="marla" value="0" /></td>
+      </tr>
+      <tr>
+        <td><label for="remainingsqft">Square Feet:</label></td>
+        <td><input type="text" id="remainingsqft" value="0" /></td>
+      </tr>
+    </table>
+    <script>
+      const sqftsInAcre = 43560
+      const sqftsInKanal = sqftsInAcre / 8
+      const sqftsInMarla = sqftsInKanal / 20
+
+      totalsqft.oninput = (e) => {
+        console.log(e)
+        let invalidInput = false
+
+        if (isNaN(totalsqft.value) || totalsqft.value.match(/-/))
+          invalidInput = true
+
+        totalsqft.style.color = invalidInput ? "red" : "initial"
+
+        totalsqft.value = totalsqft.value.replace(/^0(?!\.)/, "") || 0
+
+        if (invalidInput) return
+
+        acres.style.color = "initial"
+        kanal.style.color = "initial"
+        marla.style.color = "initial"
+        remainingsqft.style.color = "initial"
+
+        const sqft = totalsqft.value
+        acres.value = Math.floor(sqft / sqftsInAcre).toFixed(0)
+        kanal.value = Math.floor((sqft % sqftsInAcre) / sqftsInKanal).toFixed(0)
+        marla.value = Math.floor((sqft % sqftsInKanal) / sqftsInMarla).toFixed(
+          0
+        )
+        remainingsqft.value = Number((sqft % sqftsInMarla).toFixed(2))
+      }
+
+      acres.oninput =
+        kanal.oninput =
+        marla.oninput =
+        remainingsqft.oninput =
+          () => {
+            const invalidInputs = [false, false, false, false]
+
+            if (isNaN(acres.value) || acres.value.match(/-|\./))
+              invalidInputs[0] = true
+            if (isNaN(kanal.value) || kanal.value.match(/-|\./))
+              invalidInputs[1] = true
+            if (isNaN(marla.value) || marla.value.match(/-|\./))
+              invalidInputs[2] = true
+            if (isNaN(remainingsqft.value) || remainingsqft.value.match(/-/))
+              invalidInputs[3] = true
+
+            acres.style.color = invalidInputs[0] ? "red" : "initial"
+            kanal.style.color = invalidInputs[1] ? "red" : "initial"
+            marla.style.color = invalidInputs[2] ? "red" : "initial"
+            remainingsqft.style.color = invalidInputs[3] ? "red" : "initial"
+
+            acres.value = acres.value.replace(/^0(?!\.)/, "") || 0
+            kanal.value = kanal.value.replace(/^0(?!\.)/, "") || 0
+            marla.value = marla.value.replace(/^0(?!\.)/, "") || 0
+            remainingsqft.value =
+              remainingsqft.value.replace(/^0(?!\.)/, "") || 0
+
+            if (invalidInputs.some((e) => e)) return
+
+            totalsqft.style.color = "initial"
+
+            totalsqft.value = Number(
+              (
+                parseInt(acres.value) * sqftsInAcre +
+                parseInt(kanal.value) * sqftsInKanal +
+                parseInt(marla.value) * sqftsInMarla +
+                parseFloat(remainingsqft.value)
+              ).toFixed(2)
+            )
+          }
+    </script>
+  </body>
+</html>
