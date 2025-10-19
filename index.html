@@ -8,19 +8,63 @@
       :root {
         color-scheme: dark light;
       }
+
+      input[type="text"]:focus {
+        outline: none;
+      }
+
+      input,
+      select {
+        font-size: 13.3px;
+      }
+
+      input[type="radio"] {
+        margin: 0px;
+      }
+
+      .sqft-select-container {
+        gap: 5px;
+        display: flex;
+        padding-top: 3px;
+        align-items: center;
+      }
     </style>
   </head>
   <body>
-    <table>
+    <table style="zoom: 1.3">
       <tr>
-        <td><label for="sqft">Square Feet:</label></td>
+        <td colspan="2">
+          Input mode
+          <select id="input_mode">
+            <option value="text">Text</option>
+            <option value="decimal">Decimal</option>
+            <option value="numeric">Numeric</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div class="sqft-select-container">
+            Sqft in marla
+            <input type="radio" name="sqft" id="sqft_272_25" />
+            <label for="sqft_272_25">272.25</label>
+            <input type="radio" name="sqft" id="sqft_272" />
+            <label for="sqft_272">272</label>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><br /></td>
+      </tr>
+      <tr>
+        <td><label for="sqft">Sqft:</label></td>
         <td><input type="text" id="sqft" /></td>
       </tr>
       <tr>
         <td>↕️</td>
       </tr>
       <tr>
-        <td><label for="acres">Acres:</label></td>
+        <td><label for="acres">Acre:</label></td>
         <td><input type="text" id="acres" /></td>
       </tr>
       <tr>
@@ -32,14 +76,52 @@
         <td><input type="text" id="marla" /></td>
       </tr>
       <tr>
-        <td><label for="rsqft">Square Feet:</label></td>
+        <td><label for="rsqft">Sqft:</label></td>
         <td><input type="text" id="rsqft" /></td>
       </tr>
     </table>
     <script>
-      const sqftsInAcre = 43560
-      const sqftsInKanal = sqftsInAcre / 8
-      const sqftsInMarla = sqftsInKanal / 20
+      function setInputMode(mode) {
+        input_mode.value = mode
+        sqft.inputMode = mode
+        acres.inputMode = mode
+        kanal.inputMode = mode
+        marla.inputMode = mode
+        rsqft.inputMode = mode
+      }
+
+      setInputMode(localStorage.getItem("inputMode") || "numeric")
+
+      input_mode.onchange = () => {
+        setInputMode(input_mode.value)
+        localStorage.setItem("inputMode", input_mode.value)
+      }
+
+      preferredSqftsInAcre =
+        Number(localStorage.getItem("preferredSqftsInAcre")) || 43560
+
+      if (preferredSqftsInAcre === 43560) sqft_272_25.checked = true
+      else sqft_272.checked = true
+
+      let sqftsInAcre = preferredSqftsInAcre
+      let sqftsInKanal = sqftsInAcre / 8
+      let sqftsInMarla = sqftsInKanal / 20
+
+      sqft_272_25.onclick = () => {
+        sqftsInAcre = 43560
+        sqftsInKanal = sqftsInAcre / 8
+        sqftsInMarla = sqftsInKanal / 20
+        sqft.oninput()
+        localStorage.setItem("preferredSqftsInAcre", "43560")
+      }
+
+      sqft_272.onclick = () => {
+        sqftsInAcre = 43520
+        sqftsInKanal = sqftsInAcre / 8
+        sqftsInMarla = sqftsInKanal / 20
+        sqft.oninput()
+        localStorage.setItem("preferredSqftsInAcre", "43520")
+      }
 
       sqft.oninput = (e) => {
         sqftValue = Number(sqft.value)
